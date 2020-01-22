@@ -1,3 +1,0 @@
-NameError in line 117 of /work2/genphyse/dynagen/tfaraut/SeqOccin/giab/giab-benchmark/illumina/manta/Snakefile:
-name 'directory' is not defined
-  File "/work2/genphyse/dynagen/tfaraut/SeqOccin/giab/giab-benchmark/illumina/manta/Snakefile", line 117, in <module>

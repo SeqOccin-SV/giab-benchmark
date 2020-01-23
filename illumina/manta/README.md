@@ -4,6 +4,7 @@
 module load bioinfo/samtools-1.9
 module load bioinfo/bcftools-1.9
 module load bioinfo/snakemake-4.8.0
+export MANTA_EXE="/home/faraut/dynawork/SeqOccin/giab/softwares/manta-1.6.0.centos6_x86_64"
 ```
 
 #### Snakemake pipeline for manta detection

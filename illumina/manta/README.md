@@ -1,4 +1,10 @@
 
+#### SSetting the environment
+```bash
+module load bioinfo/samtools-1.9
+module load bioinfo/bcftools-1.9
+module load bioinfo/snakemake-4.8.0
+```
 
 #### Snakemake pipeline for manta detection
 

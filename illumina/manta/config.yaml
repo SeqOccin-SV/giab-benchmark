@@ -1,6 +1,6 @@
 
 
 sample_file: sample.list
-reference: "../../data/genome/hs37d5_hsa10.fa"
+reference: "../../../data/genome/hs37d5_hsa10.fa"
 chromregex: '(chr)?([1-9][0-9]?|[XY])'
-workdir: "results"
+workdir: "mantasv"

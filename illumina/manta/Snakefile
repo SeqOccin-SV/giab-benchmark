@@ -31,30 +31,24 @@ def get_bams(sample_file):
 bamfiles = get_bams(config['sample_file'])
 reference = os.path.abspath(config['reference'])
 
+rootmanta = os.environ['MANTA_EXE']
+manta_bin = ":".join([os.path.abspath(rootmanta + "/bin"),
+                      os.path.abspath(rootmanta + "/libexec")])
+os.environ["PATH"] = "%s:%s" % (manta_bin, os.environ["PATH"])
+
 workdir: config['workdir']
 
-rootmanta = "/home/faraut/dynawork/CNVPipeline/bacAsable/manta/manta-1.6.0.centos6_x86_64"
-manta_bin = rootmanta + "/bin"
 
 svtypes = ['DEL', 'INS', 'INV', 'DUP']
 
-shell.prefix("export PATH=%s:$PATH;" % manta_bin)
-
-configManta = manta_bin + "/configManta.py"
+#shell.prefix("export PATH=%s:$PATH;" % manta_bin)
 
 localrules: regions
 
 rule all:
     input:
-        expand("manta_{svtype}.vcf.gz", svtype=svtypes)
-    output:
-        touch("done.txt")
-    shell:
-        """
-        tar -zcvf rundir.tar.gz rundir
-        rm -fr rundir
-        rm -fr logs
-        """
+        expand("manta_{svtype}.vcf.gz", svtype=svtypes),
+        expand("manta_{svtype}.vcf.gz.tbi", svtype=svtypes)
 
 rule convert:
     input:
@@ -63,10 +57,10 @@ rule convert:
     output:
         "rundir/results/variants/diploidSVconverted.vcf.gz"
     params:
-        convertinv = rootmanta + "/libexec/convertInversion.py",
+        convertinv = "",
         samtoolsexe = shutil.which("samtools")
     shell:
-        "{params.convertinv} {params.samtoolsexe} {input.reference} {input.vcf}"
+        "convertInversion.py {params.samtoolsexe} {input.reference} {input.vcf}"
         " | bcftools sort -Oz -o {output}"
 
 
@@ -87,7 +81,7 @@ rule configmanta:
         1
     run:
         from subprocess import run
-        command = configManta + " "
+        command = "configManta.py "
         for bam in input.bams:
             command += "--bam %s " % bam
         command += "--referenceFasta %s " % input.reference
@@ -131,17 +125,25 @@ rule combine:
     input:
         diploid = "rundir/results/variants/diploidSVconverted.vcf.gz"
     output:
-        "manta.vcf.gz"
+        vcf="manta.vcf.gz",
+        tbi="manta.vcf.gz.tbi"
     params:
         resultdir = "rundir/results"
     shell:
-        "../manta_combine.sh {params.resultdir} | bgzip -c > {output}"
+        """
+        bcftools view {input.diploid} -Oz -o {output.vcf}
+        tabix {output.vcf}
+        """
+        #"../manta_combine.sh {params.resultdir} | bgzip -c > {output}"
 
 rule splitvcf:
     input:
         "manta.vcf.gz"
     output:
         variants = "manta_{svtype}.vcf.gz",
+        index = "manta_{svtype}.vcf.gz.tbi"
     shell:
-        " bcftools view -i'INFO/SVTYPE=\"{wildcards.svtype}\" && INFO/CIEND!=\".\"' "
-        "{input} -Oz -o {output.variants}"
+        """
+        bcftools view -i'INFO/SVTYPE=\"{wildcards.svtype}\" && INFO/CIEND!=\".\"' {input} -Oz -o {output.variants}
+        tabix {output.variants}
+        """

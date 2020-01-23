@@ -144,6 +144,6 @@ rule splitvcf:
         index = "manta_{svtype}.vcf.gz.tbi"
     shell:
         """
-        bcftools view -i'INFO/SVTYPE=\"{wildcards.svtype}\" && INFO/CIEND!=\".\"' {input} -Oz -o {output.variants}
+        bcftools view -i'INFO/SVTYPE=\"{wildcards.svtype}\"' {input} -Oz -o {output.variants}
         tabix {output.variants}
         """

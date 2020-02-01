@@ -5,7 +5,7 @@
 
 Setting the environment
 ```bash
-conda activate cnvpipeline"
+conda activate cnvpipeline
 ```
 
 Snakemake command

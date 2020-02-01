@@ -1,12 +1,10 @@
 
 #### Running the linkedSV pipeline on HG002
 
-##### genologin
-
 #### Running the pipeline
 
 
-
+....
 
 
 

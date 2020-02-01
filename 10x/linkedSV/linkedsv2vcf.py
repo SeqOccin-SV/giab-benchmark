@@ -41,7 +41,7 @@ def get_contigs(reference):
 
 def vcf_from_scratch(output_file, contigs):
     """
-    A tiny vcf file whith a minimal header with contig information
+    Constructs a tiny vcf file whith a minimal header and with contig information
     """
     date = datetime.datetime.now()
     tmp_vcf = output_file + "_tmp"
@@ -57,8 +57,8 @@ def vcf_from_scratch(output_file, contigs):
 
 def reformat_bedpe2vcfrecords(bedpefile, vcf_header):
     """
-        Parsing bedpe records to construct the records
-        Genotype is set to unknown
+    Parsing bedpe records to construct the records
+    Genotype is set to unknown
     """
     linkedsv_variants = BedTool(bedpefile)
     # Bedpe fields : https://github.com/WGLab/LinkedSV
@@ -92,8 +92,8 @@ def reformat_bedpe2vcfrecords(bedpefile, vcf_header):
 
 def main(bedfile, output_file, genome_file):
     """
-        Constructing a vcf file from scratch using the linkedSV
-        bedpe inputfile thzta describes the variants
+    Constructing a vcf file from scratch using the linkedSV and pysam module
+    bedpe inputfile describing the variants
     """
     contigs = get_contigs(genome_file)
     tmp_vcf = vcf_from_scratch(output_file, contigs)

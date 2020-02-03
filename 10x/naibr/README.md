@@ -31,7 +31,7 @@ git clone https://github.com/raphael-group/NAIBR.git
 
 ```bash
 rm -f naibr_del*.vcf* noheader.bedpe
-tail -n+2 NAIBR_SVs.bedpe noheader.bedpe
+tail -n+2 NAIBR_SVs.bedpe > noheader.bedpe
 python naibr2vcf.py -i nohead.bedpe.bedpe -o naibr_del.vcf -r ../../../data/genome/hs37d5_hsa10.fa
 cat naibr_del.vcf | awk '$1 ~ /^#/ {print $0;next} {print $0 | "sort -k1,1 -k2,2n"}' > naibr_del_sorted.vcf
 bgzip naibr_del_sorted.vcf

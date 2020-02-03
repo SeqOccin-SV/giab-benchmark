@@ -11,12 +11,13 @@ or you can use the `10x/giabftp/bams/LR-phased_possorted_bam.bam` available in t
 ##### Setting the environment
 
 ```bash
-module load system/Python-2.7.15
-module load bioinfo/bcftools-1.9
-module load bioinfo/samtools-1.9
-python -m venv naibrenv
-source naibrenv/bin/activate
-pip install -r requirements.txt
+# module load system/Python-2.7.15
+# module load bioinfo/bcftools-1.9
+# module load bioinfo/samtools-1.9
+# python -m venv naibrenv
+# source naibrenv/bin/activate
+# pip install -r requirements.txt
+conda activate /work/project/seqoccin/tools/miniconda/miniconda3/envs/naibr/
 git clone https://github.com/raphael-group/NAIBR.git
 ```
 

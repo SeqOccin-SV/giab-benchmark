@@ -1,0 +1,1 @@
+data/illumina/bams/100X/HG002.bam

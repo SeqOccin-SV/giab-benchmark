@@ -73,8 +73,10 @@ def reformat_bedpe2vcfrecords(bedpefile, vcf_header):
         variant = dict(zip(keys, row))
         infos.clear()
         infos['SVTYPE'] = variant['sv_type']
-        for info in variant['info'].split(","):
+        for info in variant['info'].split(";"):
             key, value = info.split('=')
+            if (key == 'NUM_FRAGMENT_SUPPORT' or key == 'NUM_READ_PAIR'):
+                value = int(value)
             infos[key] = value
         samples = [{'GT': (None, None)}]
         rec = vcf_header.new_record(contig=str(variant['chrom1']),
@@ -108,6 +110,16 @@ def main(bedfile, output_file, genome_file):
                            description="Type of structural variant")
     vcf_in.header.info.add('SVMETHOD', number=1, type='String',
                            description="SV detection method")
+    vcf_in.header.info.add('NUM_FRAGMENT_SUPPORT', number=1, type='Integer',
+                           description="Number of fragments supporting the variant")
+    vcf_in.header.info.add('NUM_READ_PAIR', number=1, type='Integer',
+                           description="Number of read pairs supporting the variant")
+    vcf_in.header.info.add('ENDPOINT1', number=1, type='String',
+                           description="?")
+    vcf_in.header.info.add('ENDPOINT2', number=1, type='String',
+                           description="?")
+    vcf_in.header.info.add('BARCODES', number=1, type='String',
+                           description="List of molecules barcodes supporting the variant")
     vcf_in.header.formats.add('GT', number=1, type='String',
                               description="Genotype")
     vcf_in.header.add_sample(ashkenazim_son)

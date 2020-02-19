@@ -9,7 +9,6 @@
 import os
 import argparse
 import datetime
-import json
 
 from collections import defaultdict
 import collections
@@ -76,20 +75,23 @@ def reformat_bedpe2vcfrecords(bedpefile, vcf_header):
     
     with open(bedpefile) as naibr_variants:
         for row in naibr_variants:
-            # ~ # skipping first row
-            # ~ if (i==0):
-                # ~ i += 1
-                # ~ continue
+            # skipping first row
+            if (i==0):
+                i += 1
+                continue
             variant = dict(zip(keys, row.rstrip().split('\t')))
-            # ~ print(json.dumps(variant))
-            # ~ break
-            # ~ for info in variant['info'].split(","):
-                # ~ key, value = info.split('=')
-                # ~ infos[key] = value
             samples = [{'GT': (None, None)}]
+            '''
+            From NAIBR github: https://github.com/raphael-group/NAIBR/issues/11
+            "The orientation field is actually key to distinguishing between SV types."
+            "In the reference genome segments are aligned head to tail, so '+-' orientation is the reference orientation (which includes deletions). '--' and '++' indicate an novel adjacency created by a inversion and '-+' indicates a novel adjacency created by a tandem duplication."
+            +- -> Deletion (and insertion?)
+            -- | ++ -> Inversion
+            -+ -> Tandem Duplication
+            '''
             # Filtering to conserve only deletion
             print(str(variant['orientation']))
-            if (str(variant['orientation']) == '++'):
+            if (str(variant['orientation']) == '+-'):
                 print('success')
                 infos.clear()
                 infos['SVTYPE'] = 'DEL'
@@ -132,6 +134,8 @@ def main(bedfile, output_file, genome_file):
                            description="Type of structural variant")
     vcf_in.header.info.add('SVMETHOD', number=1, type='String',
                            description="SV detection method")
+    vcf_in.header.filters.add('FAIL', number=None, type=None,
+                           description="Fail to pass filtering")                       
     vcf_in.header.formats.add('GT', number=1, type='String',
                               description="Genotype")
     vcf_in.header.add_sample(ashkenazim_son)

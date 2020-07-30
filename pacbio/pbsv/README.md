@@ -3,8 +3,8 @@
 #### Settin python env with PacBio helper script
 
 # check for module load on genotoul
-conda env create -p pbsv -f environment.yam
-conda activate pbsv
+conda env create -p ./pbsv -f environment.yaml
+conda activate ./pbsv/
 
 #### Running the pipeline
 

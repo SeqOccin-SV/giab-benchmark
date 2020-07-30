@@ -1,0 +1,77 @@
+#!/usr/bin/env python
+
+ref = '/home/adf/seqoccin/data/reference/hs37d5_hsa10.fa'
+
+rule all:
+	''' Generic all rule to launch the full pipeline
+	'''
+	input:
+	# do not get the default rule thingy
+		"{sample}-pbmm2.vcf"
+
+rule pbmm2_fastq:
+	''' rule to align reads with minimap2 wrapper from fastq file
+	generally, fastq file input is used for HiFi reads coming out of CCS
+	'''
+	input:
+		"{sample}.fastq.gz"
+		# ~ lambda wildcards: config['sample'][wildcards.sample]
+	output:
+		bam="{sample}-pbmm2.bam",
+		bai="{sample}-pbmm2.bai"
+	log:
+		"logs/pbmm2/{sample}.log"
+	benchmark:
+		"bench/{sample}.pbmm2.benchmark.txt"
+	threads: 10
+	shell:
+		# ~ "pbmm2 align "+ref+" {input} {output.bam} --sort -j {threads} -J {threads} --sample test "
+		"pbmm2 align "+config['ref']+" {input} {output.bam} --sort -j {threads} -J {threads} --sample test "
+		"--preset CCS " # only if CCS
+		"--rg '@RG\tID:movieTest' " # only if from fastq, not ok for subreads.bam
+		" 2> {log}"
+
+# ~ rule pbmm2_subreads:
+	''' rule to align reads with minimap2 wrapper from subreads.bam file
+	Best option for CLR reads
+	Need to know if CCS preset can launch ccs software and so, take care of HiFi reads
+	'''
+	# ~ input:
+		# ~ "{sample}.subreads.bam"
+	# ~ output:
+		# ~ bam="{sample}-pbmm2.bam",
+		# ~ bai="{sample}-pbmm2.bai"
+	# ~ threads: 10 # max, will be reduce if less is given to snakemake
+	# ~ shell:
+		# ~ "pbmm2 align "+ref+" {input} {output.bam} --sort -j {threads} -J {threads} --sample test "
+		# ~ "--preset CCS " # only if CCS
+
+rule pbsv_discover:
+	''' first rule for sv detection, use bam to look for regions with possible variants
+	'''
+	input:
+		"{sample}-pbmm2.bam"
+	output:
+		"{sample}-pbmm2.svig.gz"
+	log:
+		"logs/pbsv/{sample}_discover.log"
+	shell:
+		"pbsv discover {input} {output}"
+		" 2> {log}"
+
+rule pbsv_call:
+	''' second rule for sv detection, use svig information to call variants
+	'''
+	input:
+		"{sample}-pbmm2.svig.gz"
+	output:
+		"{sample}-pbmm2.vcf"
+	log:
+		"logs/pbsv/{sample}_call.log"
+	benchmark:
+		"bench/{sample}.pbsvCall.benchmark.txt"
+	shell:
+		# ~ "pbsv call "+ref+" {input} {output}"
+		# ~ "pbsv call {config.ref} {input} {output}"
+		"pbsv call "+config['ref']+" {input} {output}"
+		" 2> {log}"

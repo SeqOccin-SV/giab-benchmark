@@ -1,0 +1,4 @@
+# Path to reference genome fasta file
+ref: '/home/adf/seqoccin/data/reference/hs37d5_hsa10.fa'
+# Sample file. Either subreads.bam or fastq file of PacBio reads
+sample: 'Trio2.offspring.run1.CLR.ccs.fastq.gz'

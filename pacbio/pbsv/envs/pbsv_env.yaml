@@ -1,4 +1,4 @@
-name: pbsv
+name: pbsv-snake
 channels:
   - bioconda
 dependencies:

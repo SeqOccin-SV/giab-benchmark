@@ -1,20 +1,68 @@
 #!/usr/bin/env python
 
-ref = '/home/adf/seqoccin/data/reference/hs37d5_hsa10.fa'
+# ref = '/home/adf/seqoccin/data/reference/hs37d5_hsa10.fa'
+import pandas as pd
+import pathlib
+from pprint import pprint
 
+samples = pd.read_table(config['samples']).set_index('sample', drop=False)
+
+###############################################################
+### Method
+###############################################################
+def get_files(wildcards):
+	''' Parse the samples.txt file
+	'''
+	files = samples.loc[wildcards.sample, 'path'].split(',')
+	return(files)
+
+def write_fofn(wildcards):
+	''' write a fofn file based on samples.txt information
+	the file is named depending on submitted datatypes for CLR and CCS differentiation
+	'''
+	files = get_files(wildcards)
+	fofnName = ''
+	suffixes = map(get_suffix, files)
+	test = list(set(suffixes))
+
+	pathlib.Path("fofn").mkdir(parents=True, exist_ok=True)
+
+	if (len(test) > 1):
+		raise Exception('''You got several datatypes for sample {}. 
+You have to analyze CLR and HiFi data separatedly.'''.format(wildcards.sample))
+	else:
+		if (test[0].endswith('subreads.bam')):
+			fofnName = 'fofn/'+wildcards.sample+'_subreads.fofn'
+		elif (test[0].endswith('fastq.gz') or test[0].endswith('fq.gz')):
+			fofnName = 'fofn/'+wildcards.sample+'_fastq.fofn'
+
+	with open(fofnName, 'w') as fh:
+		for f in files:
+			fh.write(f+"\n")
+	return(fofnName)
+
+def get_suffix(string):
+	''' Return path file suffixes
+	'''
+	return(''.join(pathlib.Path(string).suffixes))
+
+###############################################################
+### Rule
+###############################################################
 rule all:
 	''' Generic all rule to launch the full pipeline
 	'''
 	input:
 	# do not get the default rule thingy
-		"{sample}-pbmm2.vcf"
+		expand("{sample}-pbmm2.vcf", sample=samples.index)
 
 rule pbmm2_fastq:
 	''' rule to align reads with minimap2 wrapper from fastq file
 	generally, fastq file input is used for HiFi reads coming out of CCS
 	'''
 	input:
-		"{sample}.fastq.gz"
+		fofn = write_fofn
+		# "{sample}.fastq.gz"
 		# ~ lambda wildcards: config['sample'][wildcards.sample]
 	output:
 		bam="{sample}-pbmm2.bam",
@@ -23,12 +71,17 @@ rule pbmm2_fastq:
 		"logs/pbmm2/{sample}.log"
 	benchmark:
 		"bench/{sample}.pbmm2.benchmark.txt"
+	params:
+		rg = "@RG\tID:movie{sample}"
+	conda:
+		'envs/pbsv_env.yaml'
 	threads: 10
 	shell:
-		# ~ "pbmm2 align "+ref+" {input} {output.bam} --sort -j {threads} -J {threads} --sample test "
+		# ~ "pbmm2 align "+ref+" {input.fofn} {output.bam} --sort -j {threads} -J {threads} --sample test "
 		"pbmm2 align "+config['ref']+" {input} {output.bam} --sort -j {threads} -J {threads} --sample test "
 		"--preset CCS " # only if CCS
 		"--rg '@RG\tID:movieTest' " # only if from fastq, not ok for subreads.bam
+		# should change the above to "--rg {params.rg}"
 		" 2> {log}"
 
 # ~ rule pbmm2_subreads:
@@ -55,6 +108,8 @@ rule pbsv_discover:
 		"{sample}-pbmm2.svig.gz"
 	log:
 		"logs/pbsv/{sample}_discover.log"
+	conda:
+		'envs/pbsv_env.yaml'
 	shell:
 		"pbsv discover {input} {output}"
 		" 2> {log}"
@@ -70,6 +125,8 @@ rule pbsv_call:
 		"logs/pbsv/{sample}_call.log"
 	benchmark:
 		"bench/{sample}.pbsvCall.benchmark.txt"
+	conda:
+		'envs/pbsv_env.yaml'
 	shell:
 		# ~ "pbsv call "+ref+" {input} {output}"
 		# ~ "pbsv call {config.ref} {input} {output}"

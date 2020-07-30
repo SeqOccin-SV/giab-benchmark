@@ -1,11 +1,14 @@
 #!/bin/bash
 
-if [ $# -ne 4 ]
+if [ $# -ne 0 ]
 then
-	echo 'USAGE: launch.pbsv.smkj <sample[fastq|subreads]> <ref> <ncore> <mem>'
+	echo 'USAGE: launch.pbsv.smkj'
+	exit 1
+fi
 
 #~ conda env create -p ./pbsv -f environment.yaml
 #~ conda activate ./pbsv/
 
-snakemake --cluster "sbatch -p workq " --configfile config.yaml \
+snakemake -j 4 --cluster "sbatch -p workq " --cluster-config cluster.yaml \
+	--configfile config.yaml \
 	--use-conda

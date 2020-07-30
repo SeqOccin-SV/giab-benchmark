@@ -1,4 +1,4 @@
 # Path to reference genome fasta file
-ref: '/home/adf/seqoccin/data/reference/hs37d5_hsa10.fa'
+ref: '/work/project/seqoccin/data/species/bos_taurus/ARS-UCD1.2/refdata-GCA_002263795.2_ARS-UCD1.2_genomic.ensemblchrnames.onlychr/fasta/genome.fa'
 # Sample file. Either subreads.bam or fastq file of PacBio reads
-sample: 'Trio2.offspring.run1.CLR.ccs.fastq.gz'
+samples: 'samples.txt'

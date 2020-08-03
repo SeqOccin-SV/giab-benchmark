@@ -8,8 +8,9 @@ from pprint import pprint
 samples = pd.read_table(config['samples']).set_index('sample', drop=False)
 
 ###############################################################
-### Method
+### Methods
 ###############################################################
+
 def get_files(wildcards):
 	''' Parse the samples.txt file
 	'''
@@ -33,7 +34,7 @@ You have to analyze CLR and HiFi data separatedly.'''.format(wildcards.sample))
 	else:
 		if (test[0].endswith('subreads.bam')):
 			fofnName = 'fofn/'+wildcards.sample+'_subreads.fofn'
-		elif (test[0].endswith('fastq.gz') or test[0].endswith('fq.gz')):
+		elif (test[0].endswith('fastq.gz') or test[0].endswith('fq.gz') or test[0].endswith('fastq') or test[0].endswith('fq')):
 			fofnName = 'fofn/'+wildcards.sample+'_fastq.fofn'
 
 	with open(fofnName, 'w') as fh:
@@ -47,14 +48,18 @@ def get_suffix(string):
 	return(''.join(pathlib.Path(string).suffixes))
 
 ###############################################################
-### Rule
+### Rules
 ###############################################################
+
 rule all:
 	''' Generic all rule to launch the full pipeline
 	'''
 	input:
 	# do not get the default rule thingy
-		expand("{sample}-pbmm2.vcf", sample=samples.index)
+		expand("calling/{sample}-pbmm2.vcf", sample=samples.index)
+
+# Could add a rule to produce an index for reference 
+# Test if it improves computation time
 
 rule pbmm2_fastq:
 	''' rule to align reads with minimap2 wrapper from fastq file
@@ -65,24 +70,42 @@ rule pbmm2_fastq:
 		# "{sample}.fastq.gz"
 		# ~ lambda wildcards: config['sample'][wildcards.sample]
 	output:
-		bam="{sample}-pbmm2.bam",
-		bai="{sample}-pbmm2.bai"
+		bam="mapping/{sample}-pbmm2.bam"
 	log:
-		"logs/pbmm2/{sample}.log"
+		stdout="logs/pbmm2/{sample}.out",
+		stderr="logs/pbmm2/{sample}.log"
 	benchmark:
 		"bench/{sample}.pbmm2.benchmark.txt"
 	params:
-		rg = "@RG\tID:movie{sample}"
+		rg = '@RG\\tID:movie{sample}\\tSM:{sample}'
 	conda:
 		'envs/pbsv_env.yaml'
 	threads: 10
+	resources:
+		mem_gb=60
 	shell:
 		# ~ "pbmm2 align "+ref+" {input.fofn} {output.bam} --sort -j {threads} -J {threads} --sample test "
-		"pbmm2 align "+config['ref']+" {input} {output.bam} --sort -j {threads} -J {threads} --sample test "
+		# tmpdir for sort is supposed to be ./ but previously had to set before hand anyway -> check
+		"pbmm2 align "+config['ref']+" {input} {output.bam} --sort "
 		"--preset CCS " # only if CCS
-		"--rg '@RG\tID:movieTest' " # only if from fastq, not ok for subreads.bam
+		"--sample {wildcards.sample} --rg {params.rg} " # only if from fastq, not ok for subreads.bam
 		# should change the above to "--rg {params.rg}"
-		" 2> {log}"
+		" > {log.stdout} 2> {log.stderr}"
+
+rule bam_index:
+	input:
+		"mapping/{sample}-pbmm2.bam"
+	output:
+		"mapping/{sample}-pbmm2.bam.bai"
+	log:
+		"logs/samtools/{sample}.log"
+	conda:
+		'envs/pbsv_env.yaml'
+	threads: 4
+	resources:
+		mem_gb=8
+	shell:
+		"samtools index -@ 4 {input} 2> {log}"
 
 # ~ rule pbmm2_subreads:
 	''' rule to align reads with minimap2 wrapper from subreads.bam file
@@ -103,30 +126,37 @@ rule pbsv_discover:
 	''' first rule for sv detection, use bam to look for regions with possible variants
 	'''
 	input:
-		"{sample}-pbmm2.bam"
+		bam="mapping/{sample}-pbmm2.bam",
+		bai="mapping/{sample}-pbmm2.bam.bai"
 	output:
-		"{sample}-pbmm2.svig.gz"
+		"calling/{sample}-pbmm2.svsig.gz"
 	log:
 		"logs/pbsv/{sample}_discover.log"
 	conda:
 		'envs/pbsv_env.yaml'
+	threads: 4
+	resources:
+		mem_gb=20
 	shell:
-		"pbsv discover {input} {output}"
+		"pbsv discover {input.bam} {output}"
 		" 2> {log}"
 
 rule pbsv_call:
-	''' second rule for sv detection, use svig information to call variants
+	''' second rule for sv detection, use .svsig.gz information to call variants
 	'''
 	input:
-		"{sample}-pbmm2.svig.gz"
+		"calling/{sample}-pbmm2.svsig.gz"
 	output:
-		"{sample}-pbmm2.vcf"
+		"calling/{sample}-pbmm2.vcf"
 	log:
 		"logs/pbsv/{sample}_call.log"
 	benchmark:
 		"bench/{sample}.pbsvCall.benchmark.txt"
 	conda:
 		'envs/pbsv_env.yaml'
+	threads: 10
+	resources:
+		mem_gb=50
 	shell:
 		# ~ "pbsv call "+ref+" {input} {output}"
 		# ~ "pbsv call {config.ref} {input} {output}"

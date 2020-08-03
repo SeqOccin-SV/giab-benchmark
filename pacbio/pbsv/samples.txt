@@ -1,2 +1,0 @@
-sample	path
-Bovin-37610	Trio2.offspring.run1.CLR.ccs.fastq.gz

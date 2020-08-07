@@ -18,22 +18,19 @@ All vcf files are located under the following dir
 ```
 /work2/project/seqoccin/svdetection/results/Trio2_offspring
 ```
-The directories detailed in the following table are relative to this root dir
+The vcf files in the following table are relative to this root dir
 
 
-| Technology |  caller   | sv dir |
+| Technology |  caller   | vcf files |
 |:----------|:-----------|:------|
-| Illumina   | manta      |  illumina_manta/diploid | 
-| Illumina   | cnvpipeline  | illumina_cnvpipeline  |
-| Nanopore   | svim        |  nanopore_svim |
-| Nanopore   | sniffles    |  nanopore_sniffles | 
-| PacBio CLR | pbsv        |  pacbio_CLR_pbsv + pacbio_CLR-GP_pbsv | 
-| PacBio CCS | pbsv        |  pacbio_CCS_pbsv |
-| 10X        | longranger  | 10x_longranger |
-| 10X        | linkedSV    | 10x_longranger |
- 
-
-_Should the exact file names be given instead ?_
+| Illumina   | manta      |  illumina_manta/diploidSV.vcf.gz| 
+| Illumina   | cnvpipeline  | illumina_cnvpipeline/DEL/concat_DEL_final.vcf.gz|
+| Nanopore   | svim        |  nanopore_svim/final_results.vcf.gz |
+| Nanopore   | sniffles    |  nanopore_sniffles/sniffles_FullvsARS.vcf.gz | 
+| PacBio CLR | pbsv        |  pacbio_CLR_pbsv/Trio2-offspring-CLR_ARS_pbmm2.vcf.gz <br> pacbio_CLR-GP_pbsv/Trio2-offspring-CLR-GetP_ARSonlyChr_pbmm2.vcf.gz | 
+| PacBio CCS | pbsv        |  pacbio_CCS_pbsv/Trio2-offspring-CCS15kb_ARSonlyChr_pbmm2.vcf.gz |
+| 10X        | longranger  | 10x_longranger/dels.vcf.gz|
+| 10X        | linkedSV    | ? |
 
 Best policy should be SV discovered by at least 2 methods/technologies.  
 For next version, reads subsampling and cross technology local assembly could be a good idea.

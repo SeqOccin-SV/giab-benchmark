@@ -25,16 +25,17 @@ The directories detailed in the following table are relative to this root dir
 |:----------:|---------------:|-------------------:|
 | Illumina     |  manta    |  illumina_manta/diploid | 
 | Illumina     |  cnvpipeline  | illumina_cnvpipeline  |
-| Nanopore     |   svim        |  nanopore_svim | 
-| Nanopore     |   sniffles    |  nanopore_sniffles | 
-| PacBio CLR   |   pbsv        |  pacbio_CLR_pbsv + pacbio_CLR-GP_pbsv | 
-| PacBio CCS   |   pbsv        |  pacbio_CCS_pbsv | 
-| 10X          |  longranger    | 10x_longranger |
+| Nanopore     |  svim        |  nanopore_svim | 
+| Nanopore     |  sniffles    |  nanopore_sniffles | 
+| PacBio CLR   |  pbsv        |  pacbio_CLR_pbsv + pacbio_CLR-GP_pbsv | 
+| PacBio CCS   |  pbsv        |  pacbio_CCS_pbsv | 
+| 10X          |  longranger  | 10x_longranger |
 | 10X          |  linkedSV    | 10x_longranger |
  
 
+_Should the exact file names be given instead ?_
 
-Best policy should be SV discovered by at least 2 methods/technologies.
+Best policy should be SV discovered by at least 2 methods/technologies.  
 For next version, reads subsampling and cross technology local assembly could be a good idea.
 
 # Basic steps

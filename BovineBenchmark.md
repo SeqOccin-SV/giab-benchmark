@@ -15,8 +15,7 @@ Trio2 offspring variants were detected with several technologies
 
 
 #####  Available variants data sets
-
-Different methologies that produced the results.  
+ 
 All vcf files are located under the following dir
 ```
 /work2/project/seqoccin/svdetection/results/Trio2_offspring

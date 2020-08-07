@@ -1,11 +1,38 @@
 Bovine SV reference set construction
 --------------------------------------
 
-This markdown will contain the thoughts and commands to create the first version of of the bovine SV reference set based on Trio2 offspring
+#### Available sequence data sets
 
-As JOBIM 2020 ask for a resubmission for june 14th and a definitive poster for june 18th, reference set construction need to be rushed.
 
-It is vital to quickly get a starting set for june 8th (10th) to leave some times for vcf statistics.
+| Technology   |   runs |  depth of Coverage | 
+|:-------------|-----------------:|---------------------:|
+| Illumina     |  2 | 120X  | 
+| Nanopore     |  5 |  55X |
+| PacBio CLR   |  2 |  90X  | 
+| PacBio CCS   | 4  | 15X |
+
+
+#####  Available variants data sets
+
+All vcf files are located under the following dir
+```
+/work2/project/seqoccin/svdetection/results/Trio2_offspring
+```
+The directories detailed in the following table are relative to this root dir
+
+
+| Technology   |  caller   | sv dir |
+|:----------:|---------------:|-------------------:|
+| Illumina     |  manta    |  illumina_manta/diploid | 
+| Illumina     |  cnvpipeline  | illumina_cnvpipeline  |
+| Nanopore     |   svim        |  nanopore_svim | 
+| Nanopore     |   sniffles    |  nanopore_sniffles | 
+| PacBio CLR   |   pbsv        |  pacbio_CLR_pbsv + pacbio_CLR-GP_pbsv | 
+| PacBio CCS   |   pbsv        |  pacbio_CCS_pbsv | 
+| 10X          |  longranger    | 10x_longranger |
+| 10X          |  linkedSV    | 10x_longranger |
+ 
+
 
 Best policy should be SV discovered by at least 2 methods/technologies.
 For next version, reads subsampling and cross technology local assembly could be a good idea.

@@ -22,7 +22,7 @@ The directories detailed in the following table are relative to this root dir
 
 
 | Technology |  caller   | sv dir |
-|:----------:|-----------:|------:|
+|:----------|:-----------|:------|
 | Illumina   | manta      |  illumina_manta/diploid | 
 | Illumina   | cnvpipeline  | illumina_cnvpipeline  |
 | Nanopore   | svim        |  nanopore_svim |

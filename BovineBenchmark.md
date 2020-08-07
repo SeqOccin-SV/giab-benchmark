@@ -21,16 +21,16 @@ All vcf files are located under the following dir
 The directories detailed in the following table are relative to this root dir
 
 
-| Technology   |  caller   | sv dir |
-|:----------:|---------------:|-------------------:|
-| Illumina     |  manta    |  illumina_manta/diploid | 
-| Illumina     |  cnvpipeline  | illumina_cnvpipeline  |
-| Nanopore     |  svim        |  nanopore_svim |
-| Nanopore     |  sniffles    |  nanopore_sniffles | 
-| PacBio CLR   |  pbsv        |  pacbio_CLR_pbsv + pacbio_CLR-GP_pbsv | 
-| PacBio CCS   |  pbsv        |  pacbio_CCS_pbsv |
-| 10X          |  longranger  | 10x_longranger |
-| 10X          |  linkedSV    | 10x_longranger |
+| Technology |  caller   | sv dir |
+|:----------:|-----------:|------:|
+| Illumina   | manta      |  illumina_manta/diploid | 
+| Illumina   | cnvpipeline  | illumina_cnvpipeline  |
+| Nanopore   | svim        |  nanopore_svim |
+| Nanopore   | sniffles    |  nanopore_sniffles | 
+| PacBio CLR | pbsv        |  pacbio_CLR_pbsv + pacbio_CLR-GP_pbsv | 
+| PacBio CCS | pbsv        |  pacbio_CCS_pbsv |
+| 10X        | longranger  | 10x_longranger |
+| 10X        | linkedSV    | 10x_longranger |
  
 
 _Should the exact file names be given instead ?_
